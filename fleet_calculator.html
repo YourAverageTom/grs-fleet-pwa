@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRS Fleet Efficiency Calculator</title>
+
+<!-- Tailwind & Chart.js CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+<style>
+body{background:linear-gradient(135deg,#0f172a,#1e293b);} 
+.result-card{transition:transform .3s ease}
+.result-card:hover{transform:scale(1.05)}
+#attractScreen{
+position:fixed; inset:0;
+display:flex; flex-direction:column; justify-content:center; align-items:center;
+background:linear-gradient(135deg,#020617,#0f172a);
+color:white; z-index:50; text-align:center; cursor:pointer;
+}
+#attractScreen h1{font-size:3rem;font-weight:800;max-width:900px;}
+#attractScreen p{margin-top:20px;font-size:1.2rem;opacity:.8;animation:pulse 2s infinite;}
+@keyframes pulse{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
+</style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 text-slate-800">
+
+<!-- Splash Screen -->
+<div id="attractScreen" onclick="startCalculator()">
+<h1>UK Fleets Waste £6,000+ Per Vehicle Per Year In Fuel</h1>
+<p>Tap anywhere to calculate your fleet savings</p>
+</div>
+
+<!-- Calculator -->
+<div id="calculator" class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-10 hidden">
+<div class="text-center mb-6">
+<h1 class="text-3xl font-bold text-slate-900">Fleet Efficiency Calculator</h1>
+<p class="text-slate-500 mt-2">Estimate fuel savings and operational impact from smarter fleet telematics.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<input id="name" type="text" placeholder="Your Name" class="p-3 border rounded-lg">
+<input id="email" type="email" placeholder="Email Address" class="p-3 border rounded-lg">
+<input id="company" type="text" placeholder="Company Name" class="p-3 border rounded-lg">
+<input id="fleet" type="number" placeholder="Fleet Size (vehicles)" class="p-3 border rounded-lg">
+<input id="mileage" type="number" placeholder="Annual Mileage per Vehicle" class="p-3 border rounded-lg">
+<input id="mpg" type="number" placeholder="Average MPG" class="p-3 border rounded-lg">
+<div class="flex flex-col">
+<label class="text-sm text-slate-500">Fuel Cost (£ per litre)</label>
+<input id="fuelcost" type="range" min="1" max="2" step="0.01" value="1.45" oninput="fuelDisplay.innerText=this.value" class="w-full">
+<span id="fuelDisplay" class="font-semibold">1.45</span>
+</div>
+<select id="improvement" class="p-3 border rounded-lg">
+<option value="0.08">8% Efficiency Improvement</option>
+<option value="0.10">10% Efficiency Improvement</option>
+<option value="0.12" selected>12% Efficiency Improvement</option>
+<option value="0.15">15% Efficiency Improvement</option>
+<option value="0.18">18% Efficiency Improvement</option>
+</select>
+</div>
+
+<div class="flex flex-col md:flex-row gap-4 mt-6">
+<button onclick="calculateSavings()" class="flex-1 bg-slate-900 text-white p-4 rounded-lg text-lg hover:bg-slate-700">Calculate Fleet Impact</button>
+<button onclick="backToHome()" class="flex-1 bg-slate-600 text-white p-4 rounded-lg hover:bg-slate-500">Back to Home</button>
+</div>
+
+<div id="results" class="mt-10 hidden">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+<div class="bg-slate-50 p-6 rounded-xl result-card">
+<p class="text-sm text-slate-500">Annual Fleet Fuel Savings</p>
+<h2 id="fuelSavings" class="text-3xl font-bold mt-2"></h2>
+</div>
+<div class="bg-slate-50 p-6 rounded-xl result-card">
+<p class="text-sm text-slate-500">Savings Per Vehicle</p>
+<h2 id="vehicleSavings" class="text-3xl font-bold mt-2"></h2>
+</div>
+<div class="bg-slate-50 p-6 rounded-xl result-card">
+<p class="text-sm text-slate-500">Annual CO₂ Reduction</p>
+<h2 id="co2Savings" class="text-3xl font-bold mt-2"></h2>
+</div>
+<div class="bg-slate-50 p-6 rounded-xl result-card">
+<p class="text-sm text-slate-500">Estimated Payback</p>
+<h2 id="payback" class="text-3xl font-bold mt-2"></h2>
+</div>
+</div>
+
+<div class="mt-10">
+<canvas id="impactChart"></canvas>
+</div>
+<div class="mt-10 text-center">
+<h2 class="text-4xl font-extrabold text-slate-900" id="bigResult"></h2>
+<p class="text-slate-500">Potential Annual Savings For Your Fleet</p>
+</div>
+
+</div>
+
+<!-- Hidden secret tap for exporting leads on iPad -->
+<div id="secretTapArea" onclick="downloadAllLeads()" 
+     style="position:fixed; top:0; left:0; width:50px; height:50px; z-index:10000;"></div>
+
+<script>
+let chart;
+
+// Splash screen
+function startCalculator(){
+ document.getElementById('attractScreen').style.display='none';
+ document.getElementById('calculator').classList.remove('hidden');
+}
+
+// Animate numbers
+function animateValue(el,start,end,duration,prefix="",suffix=""){
+ let range=end-start;
+ let startTime=null;
+ function step(timestamp){
+   if(!startTime) startTime=timestamp;
+   let progress=Math.min((timestamp-startTime)/duration,1);
+   let value=start+(range*progress);
+   el.innerText=prefix+value.toLocaleString('en-GB',{maximumFractionDigits:0})+suffix;
+   if(progress<1) requestAnimationFrame(step);
+ }
+ requestAnimationFrame(step);
+}
+
+// Save lead to CSV locally (with headers, no Hot Lead)
+function saveLeadToCSV(lead){
+  let existing = localStorage.getItem("leadsCSV") || "";
+  
+  if(!existing){
+    existing = "Name,Email,Company,Fleet Size,Annual Mileage,Average MPG,Fuel Cost (£/L),Fleet Savings (£),CO2 Saved (tonnes),Timestamp\n";
+  }
+
+  const csvRow = [
+    lead.name,
+    lead.email,
+    lead.company,
+    lead.fleet,
+    lead.mileage,
+    lead.mpg,
+    lead.fuelCost,
+    lead.savings,
+    lead.co2,
+    new Date().toISOString()
+  ].join(",") + "\n";
+
+  existing += csvRow;
+  localStorage.setItem("leadsCSV", existing);
+}
+
+// Download all leads and reset localStorage
+function downloadAllLeads() {
+  const allLeads = localStorage.getItem("leadsCSV");
+  if (!allLeads) {
+    alert("No leads collected yet!");
+    return;
+  }
+  const blob = new Blob([allLeads], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "all_fleet_leads.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+  alert("All leads downloaded successfully!");
+
+  // Clear storage for next session
+  localStorage.removeItem("leadsCSV");
+}
+
+// Back to home button
+function backToHome() {
+  document.getElementById('calculator').classList.add('hidden');
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('attractScreen').style.display = 'flex';
+  document.getElementById('name').value = '';
+  document.getElementById('email').value = '';
+  document.getElementById('company').value = '';
+  document.getElementById('fleet').value = '';
+  document.getElementById('mileage').value = '';
+  document.getElementById('mpg').value = '';
+  document.getElementById('fuelcost').value = '1.45';
+  document.getElementById('fuelDisplay').innerText = '1.45';
+  document.getElementById('improvement').value = '0.12';
+}
+
+// Calculate savings
+function calculateSavings(){
+const name=document.getElementById('name').value;
+const email=document.getElementById('email').value;
+const company=document.getElementById('company').value;
+const fleet=parseFloat(document.getElementById('fleet').value);
+const mileage=parseFloat(document.getElementById('mileage').value);
+const mpg=parseFloat(document.getElementById('mpg').value);
+const fuelCost=parseFloat(document.getElementById('fuelcost').value);
+const improvement=parseFloat(document.getElementById('improvement').value);
+
+if(!name||!email||!fleet||!mileage||!mpg||!fuelCost){alert("Please complete all fields"); return;}
+
+const litresUsed=(mileage/mpg)*4.546;
+const annualFuelCost=litresUsed*fuelCost;
+const savingsPerVehicle=annualFuelCost*improvement;
+const fleetFuelCost=annualFuelCost*fleet;
+const fleetSavings=savingsPerVehicle*fleet;
+const co2PerLitre=2.31;
+const co2SavedKg=litresUsed*improvement*co2PerLitre*fleet;
+const co2SavedTonnes=co2SavedKg/1000;
+const telematicsCostPerVehicle=180;
+const paybackMonths=(telematicsCostPerVehicle/savingsPerVehicle)*12;
+
+animateValue(document.getElementById('fuelSavings'),0,fleetSavings,900,'£');
+animateValue(document.getElementById('vehicleSavings'),0,savingsPerVehicle,900,'£');
+animateValue(document.getElementById('co2Savings'),0,co2SavedTonnes,900,'',' tonnes');
+animateValue(document.getElementById('payback'),0,paybackMonths,900,'',' months');
+animateValue(document.getElementById('bigResult'),0,fleetSavings,1200,'£');
+
+renderChart(fleetFuelCost,fleetSavings);
+
+saveLeadToCSV({
+  name,email,company,fleet,mileage,mpg,fuelCost,
+  savings:fleetSavings,
+  co2:co2SavedTonnes
+});
+
+document.getElementById('results').classList.remove('hidden');
+}
+
+// Chart
+function renderChart(cost,savings){
+const ctx=document.getElementById('impactChart');
+if(chart) chart.destroy();
+chart=new Chart(ctx,{
+type:'bar',
+data:{labels:['Total Annual Fleet Fuel Cost','Potential Annual Fleet Savings'], datasets:[{data:[cost,savings]}]},
+options:{responsive:true,plugins:{legend:{display:false}}}
+});
+}
+
+// Service worker registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log('Service worker registered.', reg))
+      .catch(err => console.error('SW registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>
