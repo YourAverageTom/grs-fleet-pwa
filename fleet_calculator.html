@@ -237,18 +237,24 @@ function downloadAllLeads() {
 // Back to home button
 function backToHome() {
      clearTimeout(inactivityTimer);
-  document.getElementById('calculator').classList.add('hidden');
-  document.getElementById('results').classList.add('hidden');
-  document.getElementById('attractScreen').style.display = 'flex';
-  document.getElementById('name').value = '';
-  document.getElementById('email').value = '';
-  document.getElementById('company').value = '';
-  document.getElementById('fleet').value = '';
-  document.getElementById('mileage').selectedIndex = 0;
-  document.getElementById('mpg').value = '';
-  document.getElementById('fuelcost').value = '1.45';
-  document.getElementById('fuelDisplay').innerText = '1.45';
-  document.getElementById('improvement').value = '0.12';
+const splash = document.getElementById('attractScreen');
+
+document.getElementById('calculator').classList.add('hidden');
+document.getElementById('results').classList.add('hidden');
+
+splash.style.display = 'flex';
+splash.classList.remove('exit');
+
+document.getElementById('name').value = '';
+document.getElementById('email').value = '';
+document.getElementById('company').value = '';
+document.getElementById('fleet').value = '';
+document.getElementById('mileage').selectedIndex = 0;
+document.getElementById('mpg').value = '';
+document.getElementById('fuelcost').value = '1.45';
+document.getElementById('fuelDisplay').innerText = '1.45';
+document.getElementById('improvement').value = '0.12';
+
 }
 
 // Calculate savings
@@ -319,6 +325,7 @@ document.addEventListener(event, resetInactivityTimer);
 </body>
 
 </html>
+
 
 
 
