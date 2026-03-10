@@ -156,7 +156,7 @@ function saveLeadToCSV(lead){
   let existing = localStorage.getItem("leadsCSV") || "";
   
   if(!existing){
-    existing = "Name,Email,Company,Fleet Size,Annual Mileage,Average MPG,Fuel Cost (£/L),Fleet Savings (£),CO2 Saved (tonnes),Timestamp\n";
+    existing = "Name,Email,Company,Fleet Size,Annual Mileage,Average MPG,Fuel Cost(£/L),Fleet Savings(£),CO2 Saved(tonnes),Timestamp";
   }
 
   const csvRow = [
@@ -275,13 +275,4 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
