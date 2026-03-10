@@ -34,6 +34,26 @@ z-index:50;
 text-align:center;
 cursor:pointer;
 
+#attractScreen h1{
+font-size:3rem;
+font-weight:800;
+max-width:900px;
+text-align:center;
+}
+
+#attractScreen p{
+margin-top:20px;
+font-size:1.2rem;
+opacity:.8;
+animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+0%{opacity:.5}
+50%{opacity:1}
+100%{opacity:.5}
+}
+
 clip-path: ellipse(140% 100% at 50% 0%);
 transform: translateY(0);
 transition: transform 0.7s ease, clip-path 0.7s ease;
@@ -162,9 +182,11 @@ function startCalculator(){
 const splash = document.getElementById('attractScreen');
 const calc = document.getElementById('calculator');
 
-calc.classList.remove('hidden');   // reveal instantly underneath
+calc.classList.remove('hidden');
 
-requestAnimationFrame(() => {
+splash.classList.remove('enter');
+
+requestAnimationFrame(()=>{
     splash.classList.add('exit');
 });
 
@@ -239,10 +261,12 @@ clearTimeout(inactivityTimer);
 const splash = document.getElementById('attractScreen');
 const calc = document.getElementById('calculator');
 
-splash.style.display = 'flex';
+splash.style.display='flex';
 
-requestAnimationFrame(() => {
-    splash.classList.remove('exit');
+splash.classList.remove('exit');
+splash.classList.remove('enter');
+
+requestAnimationFrame(()=>{
     splash.classList.add('enter');
 });
 
@@ -250,6 +274,19 @@ setTimeout(()=>{
     calc.classList.add('hidden');
     document.getElementById('results').classList.add('hidden');
 },700);
+
+// reset form
+document.getElementById('name').value='';
+document.getElementById('email').value='';
+document.getElementById('company').value='';
+document.getElementById('fleet').value='';
+document.getElementById('mileage').selectedIndex=0;
+document.getElementById('mpg').value='';
+document.getElementById('fuelcost').value='1.45';
+document.getElementById('fuelDisplay').innerText='1.45';
+document.getElementById('improvement').value='0.12';
+
+}
 
 // reset form
 document.getElementById('name').value='';
@@ -333,6 +370,7 @@ document.addEventListener(event, resetInactivityTimer);
 </body>
 
 </html>
+
 
 
 
