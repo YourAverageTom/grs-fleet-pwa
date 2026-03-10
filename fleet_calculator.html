@@ -25,8 +25,8 @@ body{background:linear-gradient(135deg,#0f172a,#1e293b);}
 position:fixed;
 top:0;
 left:0;
-width:100vw;
-height:100vh;
+width:100%;
+height:100%;
 display:flex;
 flex-direction:column;
 justify-content:center;
@@ -36,11 +36,15 @@ color:white;
 text-align:center;
 cursor:pointer;
 
-z-index:9999;
+z-index:1000;
 
 clip-path: ellipse(140% 100% at 50% 0%);
 transform: translateY(0);
 transition: transform 0.6s ease;
+}
+
+#attractScreen.slideUp{
+transform: translateY(-100%);
 }
 
 #attractScreen h1{
@@ -88,7 +92,7 @@ clip-path: ellipse(140% 100% at 50% 0%);
 </div>
 
 <!-- Calculator -->
-<div id="calculator" class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-10 hidden">
+<div id="calculator" class="hidden">
 <div class="text-center mb-6">
 <h1 class="text-3xl font-bold text-slate-900">Fleet Efficiency Calculator</h1>
 <p class="text-slate-500 mt-2">Estimate fuel savings and operational impact from smarter fleet telematics.</p>
@@ -188,12 +192,14 @@ backToHome();
 // Splash screen
 function startCalculator(){
 
-const splash = document.getElementById('attractScreen');
-const calc = document.getElementById('calculator');
+const splash = document.getElementById("attractScreen");
+const calc = document.getElementById("calculator");
 
-calc.classList.remove('hidden');
+calc.classList.remove("hidden");
 
-splash.style.transform = "translateY(-100%)";
+requestAnimationFrame(()=>{
+    splash.classList.add("slideUp");
+});
 
 resetInactivityTimer();
 
@@ -263,14 +269,14 @@ function backToHome(){
 
 clearTimeout(inactivityTimer);
 
-const splash = document.getElementById('attractScreen');
+const splash = document.getElementById("attractScreen");
 
-splash.style.transform = "translateY(0)";
+splash.classList.remove("slideUp");
 
-document.getElementById('calculator').classList.add('hidden');
-document.getElementById('results').classList.add('hidden');
+document.getElementById("calculator").classList.add("hidden");
+document.getElementById("results").classList.add("hidden");
 
-// reset form
+// reset fields
 document.getElementById('name').value='';
 document.getElementById('email').value='';
 document.getElementById('company').value='';
@@ -377,11 +383,11 @@ document.addEventListener(event, resetInactivityTimer);
 
 // Touch to start
 document.getElementById("attractScreen").addEventListener("click", startCalculator);
-document.getElementById("attractScreen").addEventListener("touchstart", startCalculator);
 </script>
 </body>
 
 </html>
+
 
 
 
