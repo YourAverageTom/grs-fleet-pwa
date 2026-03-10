@@ -256,7 +256,7 @@ const ctx=document.getElementById('impactChart');
 if(chart) chart.destroy();
 chart=new Chart(ctx,{
 type:'bar',
-data:{labels:['Total Annual Fleet Fuel Cost','Potential Annual Fleet Savings'], datasets:[{data:['£',cost,savings]}]},
+data:{labels:['Total Annual Fleet Fuel Cost','Potential Annual Fleet Savings'], datasets:[{data:[cost,savings]}]},
 options:{responsive:true,plugins:{legend:{display:false}}}
 });
 }
@@ -273,6 +273,7 @@ if ('serviceWorker' in navigator) {
 </body>
 
 </html>
+
 
 
 
