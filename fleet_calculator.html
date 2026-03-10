@@ -129,6 +129,8 @@ color:white; z-index:50; text-align:center; cursor:pointer;
 <script>
 let chart;
 
+document.getElementById('calculateBtn').disabled = true;
+
 // Splash screen
 function startCalculator(){
  document.getElementById('attractScreen').style.display='none';
@@ -208,6 +210,7 @@ function backToHome() {
   document.getElementById('fuelcost').value = '1.45';
   document.getElementById('fuelDisplay').innerText = '1.45';
   document.getElementById('improvement').value = '0.12';
+  document.getElementById('calculateBtn').disabled = false;
 }
 
 // Calculate savings
@@ -274,6 +277,7 @@ if ('serviceWorker' in navigator) {
 </body>
 
 </html>
+
 
 
 
