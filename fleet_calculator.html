@@ -34,6 +34,11 @@ z-index:50;
 text-align:center;
 cursor:pointer;
 
+clip-path: ellipse(140% 100% at 50% 0%);
+transform: translateY(0);
+transition: transform 0.6s ease;
+}
+
 #attractScreen h1{
 font-size:3rem;
 font-weight:800;
@@ -184,11 +189,7 @@ const calc = document.getElementById('calculator');
 
 calc.classList.remove('hidden');
 
-splash.classList.remove('enter');
-
-requestAnimationFrame(()=>{
-    splash.classList.add('exit');
-});
+splash.style.transform = "translateY(-100%)";
 
 resetInactivityTimer();
 
@@ -259,21 +260,24 @@ function backToHome(){
 clearTimeout(inactivityTimer);
 
 const splash = document.getElementById('attractScreen');
-const calc = document.getElementById('calculator');
 
-splash.style.display='flex';
+splash.style.transform = "translateY(0)";
 
-splash.classList.remove('exit');
-splash.classList.remove('enter');
+document.getElementById('calculator').classList.add('hidden');
+document.getElementById('results').classList.add('hidden');
 
-requestAnimationFrame(()=>{
-    splash.classList.add('enter');
-});
+// reset form
+document.getElementById('name').value='';
+document.getElementById('email').value='';
+document.getElementById('company').value='';
+document.getElementById('fleet').value='';
+document.getElementById('mileage').selectedIndex=0;
+document.getElementById('mpg').value='';
+document.getElementById('fuelcost').value='1.45';
+document.getElementById('fuelDisplay').innerText='1.45';
+document.getElementById('improvement').value='0.12';
 
-setTimeout(()=>{
-    calc.classList.add('hidden');
-    document.getElementById('results').classList.add('hidden');
-},700);
+}
 
 // reset form
 document.getElementById('name').value='';
@@ -370,6 +374,7 @@ document.addEventListener(event, resetInactivityTimer);
 </body>
 
 </html>
+
 
 
 
