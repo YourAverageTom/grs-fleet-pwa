@@ -145,6 +145,19 @@ clip-path: ellipse(140% 0% at 50% 0%);
 
 <script>
 let chart;
+let inactivityTimer;
+// Inactivity timer
+function resetInactivityTimer(){
+
+clearTimeout(inactivityTimer);
+
+inactivityTimer = setTimeout(() => {
+
+backToHome();
+
+}, 45000); // 45 seconds
+
+}
 
 // Splash screen
 function startCalculator(){
@@ -157,6 +170,8 @@ setTimeout(()=>{
     splash.style.display='none';
     document.getElementById('calculator').classList.remove('hidden');
 },700);
+
+resetInactivityTimer();
 
 }
 
@@ -221,6 +236,7 @@ function downloadAllLeads() {
 
 // Back to home button
 function backToHome() {
+     clearTimeout(inactivityTimer);
   document.getElementById('calculator').classList.add('hidden');
   document.getElementById('results').classList.add('hidden');
   document.getElementById('attractScreen').style.display = 'flex';
@@ -295,10 +311,15 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.error('SW registration failed:', err));
   });
 }
+// Timer activity reset
+['click','touchstart','keypress','input'].forEach(event => {
+document.addEventListener(event, resetInactivityTimer);
+});
 </script>
 </body>
 
 </html>
+
 
 
 
