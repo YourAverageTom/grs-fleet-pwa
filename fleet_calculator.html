@@ -23,16 +23,20 @@ body{background:linear-gradient(135deg,#0f172a,#1e293b);}
 .result-card:hover{transform:scale(1.05)}
 #attractScreen{
 position:fixed;
-inset:0;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
 background:linear-gradient(135deg,#020617,#0f172a);
 color:white;
-z-index:50;
 text-align:center;
 cursor:pointer;
+
+z-index:9999;
 
 clip-path: ellipse(140% 100% at 50% 0%);
 transform: translateY(0);
@@ -78,7 +82,7 @@ clip-path: ellipse(140% 100% at 50% 0%);
 <body class="min-h-screen flex items-center justify-center p-6 text-slate-800">
 
 <!-- Splash Screen -->
-<div id="attractScreen" onclick="startCalculator()">
+<div id="attractScreen">
 <h1>GRS Fleet Telematics Savings Potential</h1>
 <p>Tap anywhere to calculate your fleet savings</p>
 </div>
@@ -370,10 +374,15 @@ if ('serviceWorker' in navigator) {
 ['click','touchstart','keypress','input'].forEach(event => {
 document.addEventListener(event, resetInactivityTimer);
 });
+
+// Touch to start
+document.getElementById("attractScreen").addEventListener("click", startCalculator);
+document.getElementById("attractScreen").addEventListener("touchstart", startCalculator);
 </script>
 </body>
 
 </html>
+
 
 
 
