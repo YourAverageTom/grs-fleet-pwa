@@ -118,7 +118,7 @@ color:white; z-index:50; text-align:center; cursor:pointer;
 </div>
 <div class="mt-10 text-center">
 <h2 class="text-4xl font-extrabold text-slate-900" id="bigResult"></h2>
-<p class="text-slate-500">Potential Annual Savings For Your Fleet</p>
+<p class="text-slate-500">Total Potential Annual Fleet Savings (Fuel + Telematics)</p>
 </div>
      
 
@@ -254,7 +254,7 @@ animateValue(document.getElementById('fuelSavings'),0,fleetSavings,900,'£');
 animateValue(document.getElementById('vehicleSavings'),0,savingsPerVehicle,900,'£');
 animateValue(document.getElementById('co2Savings'),0,co2SavedTonnes,900,'',' tonnes');
 animateValue(document.getElementById('payback'),0,paybackMonths,900,'',' months');
-animateValue(document.getElementById('bigResult'),0,fleetSavings,1200,'£');
+animateValue(document.getElementById('bigResult'),0,totalSavings,1200,'£');
 animateValue(
   document.getElementById('telematicsSavings'),
   0,
@@ -263,7 +263,7 @@ animateValue(
   '£'
 );
 
-renderChart(fleetFuelCost,fleetSavings);
+renderChart(fleetSavings, annualFleetSaving, totalSavings);
 
 saveLeadToCSV({
   name,email,company,fleet,mileage,mpg,fuelCost,
@@ -275,13 +275,26 @@ document.getElementById('results').classList.remove('hidden');
 }
 
 // Chart
-function renderChart(cost,savings){
+function renderChart(fuelSavings, telematicsSavings, totalSavings){
 const ctx=document.getElementById('impactChart');
 if(chart) chart.destroy();
+
 chart=new Chart(ctx,{
 type:'bar',
-data:{labels:['Total Annual Fleet Fuel Cost','Potential Annual Fleet Savings'], datasets:[{data:[cost,savings]}]},
-options:{responsive:true,plugins:{legend:{display:false}}}
+data:{
+labels:[
+'Fuel Efficiency Savings',
+'Telematics Cost Savings',
+'Total Fleet Savings'
+],
+datasets:[{
+data:[fuelSavings, telematicsSavings, totalSavings]
+}]
+},
+options:{
+responsive:true,
+plugins:{legend:{display:false}}
+}
 });
 }
 
@@ -297,6 +310,7 @@ if ('serviceWorker' in navigator) {
 </body>
 
 </html>
+
 
 
 
