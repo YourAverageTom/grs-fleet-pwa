@@ -52,6 +52,7 @@ color:white; z-index:50; text-align:center; cursor:pointer;
 <input id="email" type="email" placeholder="Email Address" class="p-3 border rounded-lg">
 <input id="company" type="text" placeholder="Company Name" class="p-3 border rounded-lg">
 <input id="fleet" type="number" placeholder="Fleet Size (vehicles)" class="p-3 border rounded-lg">
+<input id="currentCost" type="number" step="0.01" placeholder="Current Telematics Cost (£ per vehicle / month)" class="p-3 border rounded-lg">
 <select id="mileage" class="p-3 border rounded-lg">
 <option value="">Annual Mileage per Vehicle</option>
 <option value="5000">5,000 miles</option>
@@ -93,7 +94,7 @@ color:white; z-index:50; text-align:center; cursor:pointer;
 </div>
 
 <div id="results" class="mt-10 hidden">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
 <div class="bg-slate-50 p-6 rounded-xl result-card">
 <p class="text-sm text-slate-500">Annual Fleet Fuel Savings</p>
 <h2 id="fuelSavings" class="text-3xl font-bold mt-2"></h2>
@@ -106,6 +107,10 @@ color:white; z-index:50; text-align:center; cursor:pointer;
 <p class="text-sm text-slate-500">Annual CO₂ Reduction</p>
 <h2 id="co2Savings" class="text-3xl font-bold mt-2"></h2>
 </div>
+<div class="bg-slate-50 p-6 rounded-xl result-card">
+<p class="text-sm text-slate-500">Annual Telematics Saving</p>
+<h2 id="telematicsSavings" class="text-3xl font-bold mt-2"></h2>
+</div>
 </div>
 
 <div class="mt-10">
@@ -115,6 +120,7 @@ color:white; z-index:50; text-align:center; cursor:pointer;
 <h2 class="text-4xl font-extrabold text-slate-900" id="bigResult"></h2>
 <p class="text-slate-500">Potential Annual Savings For Your Fleet</p>
 </div>
+     
 
 </div>
 
@@ -232,12 +238,30 @@ const co2SavedKg=litresUsed*improvement*co2PerLitre*fleet;
 const co2SavedTonnes=co2SavedKg/1000;
 const telematicsCostPerVehicle=180;
 const paybackMonths=(telematicsCostPerVehicle/savingsPerVehicle)*12;
+const currentCost=parseFloat(document.getElementById('currentCost').value);
+
+if(!currentCost){
+  alert("Please enter your current telematics cost");
+  return;
+}
+
+const ourPrice = 7.99;
+const savingPerVehicle = currentCost - ourPrice;
+const monthlyFleetSaving = savingPerVehicle * fleet;
+const annualFleetSaving = monthlyFleetSaving * 12;
 
 animateValue(document.getElementById('fuelSavings'),0,fleetSavings,900,'£');
 animateValue(document.getElementById('vehicleSavings'),0,savingsPerVehicle,900,'£');
 animateValue(document.getElementById('co2Savings'),0,co2SavedTonnes,900,'',' tonnes');
 animateValue(document.getElementById('payback'),0,paybackMonths,900,'',' months');
 animateValue(document.getElementById('bigResult'),0,fleetSavings,1200,'£');
+animateValue(
+  document.getElementById('telematicsSavings'),
+  0,
+  annualFleetSaving,
+  900,
+  '£'
+);
 
 renderChart(fleetFuelCost,fleetSavings);
 
@@ -273,6 +297,7 @@ if ('serviceWorker' in navigator) {
 </body>
 
 </html>
+
 
 
 
