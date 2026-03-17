@@ -276,7 +276,7 @@ animateValue(
   '£'
 );
 
-renderChart(fleetSavings, annualFleetSaving, totalSavings);
+renderChart(fleetFuelCost, fleetFuelCost - fleetSavings);
 
 saveLeadToCSV({
   name,email,company,fleet,mileage,mpg,fuelCost,
@@ -288,27 +288,44 @@ document.getElementById('results').classList.remove('hidden');
 }
 
 // Chart
-function renderChart(fuelSavings, telematicsSavings, totalSavings){
-const ctx=document.getElementById('impactChart');
-if(chart) chart.destroy();
+function renderChart(beforeCost, afterCost){
+  const ctx = document.getElementById('impactChart');
+  if(chart) chart.destroy();
 
-chart=new Chart(ctx,{
-type:'bar',
-data:{
-labels:[
-'Fuel Efficiency Savings',
-'Telematics Cost Savings',
-'Total Fleet Savings'
-],
-datasets:[{
-data:[fuelSavings, telematicsSavings, totalSavings]
-}]
-},
-options:{
-responsive:true,
-plugins:{legend:{display:false}}
-}
-});
+  chart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:[
+        'Current Annual Fuel Cost',
+        'Projected Cost with GRS Telematics'
+      ],
+      datasets:[{
+        data:[beforeCost, afterCost]
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:function(context){
+              return '£' + context.raw.toLocaleString();
+            }
+          }
+        }
+      },
+      scales:{
+        y:{
+          ticks:{
+            callback:function(value){
+              return '£' + value.toLocaleString();
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 // Service worker registration
