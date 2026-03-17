@@ -226,7 +226,10 @@ const mpg=parseFloat(document.getElementById('mpg').value);
 const fuelCost=parseFloat(document.getElementById('fuelcost').value);
 const improvement=parseFloat(document.getElementById('improvement').value);
 
-if(!name||!email||!fleet||!mileage||!mpg||!fuelCost){alert("Please complete all fields"); return;}
+if(!name || !email || !fleet || !mileage || !mpg || !fuelCost){
+  alert("Please complete all required fields");
+  return;
+}
 
 const litresUsed=(mileage/mpg)*4.546;
 const annualFuelCost=litresUsed*fuelCost;
@@ -238,7 +241,16 @@ const co2SavedKg=litresUsed*improvement*co2PerLitre*fleet;
 const co2SavedTonnes=co2SavedKg/1000;
 const telematicsCostPerVehicle=180;
 const paybackMonths=(telematicsCostPerVehicle/savingsPerVehicle)*12;
-const currentCost=parseFloat(document.getElementById('currentCost').value);
+const currentCost = parseFloat(document.getElementById('currentCost').value) || 0;
+
+const ourTelematicsPrice = 7.99;
+
+let annualTelematicsSaving = 0;
+
+if(currentCost > ourTelematicsPrice){
+  const savingPerVehicleMonth = currentCost - ourTelematicsPrice;
+  annualTelematicsSaving = savingPerVehicleMonth * fleet * 12;
+}
 
 if(!currentCost){
   alert("Please enter your current telematics cost");
@@ -249,6 +261,7 @@ const ourPrice = 7.99;
 const savingPerVehicle = currentCost - ourPrice;
 const monthlyFleetSaving = savingPerVehicle * fleet;
 const annualFleetSaving = monthlyFleetSaving * 12;
+const totalSavings = fleetSavings + annualTelematicsSaving;
 
 animateValue(document.getElementById('fuelSavings'),0,fleetSavings,900,'£');
 animateValue(document.getElementById('vehicleSavings'),0,savingsPerVehicle,900,'£');
